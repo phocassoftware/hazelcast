@@ -168,7 +168,7 @@ public class PartitionWideEntryOperation extends MapOperation
         keysFromIndex = new HashSet<>();
         for (QueryableEntry entry : entries) {
             keysFromIndex.add(entry.getKeyData());
-            Data response = operator.operateOnKey(entry.getKeyData()).doPostOperateOps().getResult();
+            Object response = operator.operateOnKey(entry.getKeyData()).doPostOperateOps().getResult();
             if (response != null) {
                 responses.add(entry.getKeyData(), response);
             }
@@ -181,7 +181,7 @@ public class PartitionWideEntryOperation extends MapOperation
         responses = new MapEntries(recordStore.size());
         operator = operator(this, entryProcessor, getPredicate());
         recordStore.forEach((dataKey, record) -> {
-            Data response = operator.operateOnKey(dataKey).doPostOperateOps().getResult();
+            Object response = operator.operateOnKey(dataKey).doPostOperateOps().getResult();
             if (response != null) {
                 responses.add(dataKey, response);
             }
@@ -200,7 +200,7 @@ public class PartitionWideEntryOperation extends MapOperation
             Data dataKey = toHeapData(key);
 
             // for native use variant that does not expire entries (see comment below)
-            Data response = operator.operateOnKeyValueDuringScan(dataKey, record.getValue()).getResult();
+            Object response = operator.operateOnKeyValueDuringScan(dataKey, record.getValue()).getResult();
             if (response != null) {
                 responses.add(dataKey, response);
             }

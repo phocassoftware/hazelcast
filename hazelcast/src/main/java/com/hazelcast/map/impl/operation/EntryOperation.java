@@ -19,6 +19,7 @@ package com.hazelcast.map.impl.operation;
 import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.core.EntryEventType;
 import com.hazelcast.core.HazelcastException;
+import com.hazelcast.core.Immutable;
 import com.hazelcast.core.ManagedContext;
 import com.hazelcast.core.Offloadable;
 import com.hazelcast.core.ReadOnly;
@@ -404,8 +405,12 @@ public class EntryOperation extends LockAwareOperation
                 return oldValue instanceof Data d
                         ? toHeapData(d) : oldValue;
             case OBJECT:
-                return getNodeEngine().getSerializationService()
-                        .toData(oldValue);
+                if (Immutable.isImmutable(oldValue)) {
+                    return oldValue;
+                } else {
+                    return getNodeEngine().getSerializationService()
+                            .toData(oldValue);
+                }
             case BINARY:
                 return oldValue;
             default:
@@ -449,7 +454,7 @@ public class EntryOperation extends LockAwareOperation
         private void executeReadOnlyEntryProcessor(final Object oldValue, String executorName) {
             doExecute(executorName, () -> {
                 try {
-                    Data result = operator(EntryOperation.this, entryProcessor)
+                    Object result = operator(EntryOperation.this, entryProcessor)
                             .operateOnKeyValue(dataKey, oldValue).getResult();
                     sendResponse(result);
                 } catch (Throwable t) {
@@ -477,7 +482,7 @@ public class EntryOperation extends LockAwareOperation
                     try {
                         EntryOperator entryOperator = operator(EntryOperation.this, entryProcessor)
                                 .operateOnKeyValue(dataKey, oldValue);
-                        Data result = entryOperator.getResult();
+                        Object result = entryOperator.getResult();
                         EntryEventType modificationType = entryOperator.getEventType();
                         if (modificationType != null) {
                             long newTtl = entryOperator.getEntry().getNewTtl();

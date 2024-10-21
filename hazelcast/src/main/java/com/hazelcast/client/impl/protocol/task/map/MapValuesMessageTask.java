@@ -46,7 +46,7 @@ public class MapValuesMessageTask
     protected Object reduce(Collection<QueryResultRow> result) {
         List<Data> values = new ArrayList<>(result.size());
         for (QueryResultRow resultEntry : result) {
-            values.add(resultEntry.getValue());
+            values.add(serializationService.toData(resultEntry.getValue()));
         }
         MapService mapService = (MapService) getService(MapService.SERVICE_NAME);
         incrementOtherOperationsCount(mapService, parameters);
