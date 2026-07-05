@@ -1397,6 +1397,31 @@
 
         <profile>
             <!--
+            Publishes this fork to GitHub Packages with source artifacts attached.
+            Activate with: -Pgithub-packages
+            -->
+            <id>github-packages</id>
+            <properties>
+                <github.packages.repository>phocassoftware/hazelcast</github.packages.repository>
+                <maven.source.skip>false</maven.source.skip>
+                <maven.shade.createSourcesJar>true</maven.shade.createSourcesJar>
+            </properties>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub Packages</name>
+                    <url>https://maven.pkg.github.com/${github.packages.repository}</url>
+                </repository>
+                <snapshotRepository>
+                    <id>github</id>
+                    <name>GitHub Packages</name>
+                    <url>https://maven.pkg.github.com/${github.packages.repository}</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+
+        <profile>
+            <!--
             Configures release-specific options when doing an intermediate SNAPSHOT release
 
             Ensures Javadoc, sources etc. are generated and that an appropriate distribution destination is specified
