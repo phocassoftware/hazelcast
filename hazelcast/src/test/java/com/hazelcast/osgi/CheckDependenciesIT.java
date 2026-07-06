@@ -160,7 +160,7 @@ public class CheckDependenciesIT extends HazelcastTestSupport {
     }
 
     protected boolean isMatching(String urlString) {
-        return urlString.contains("hazelcast/target");
+        return urlString.contains("hazelcast/target") && !urlString.contains("/target/surefire/");
     }
 
     protected String getMajorVersion() {
