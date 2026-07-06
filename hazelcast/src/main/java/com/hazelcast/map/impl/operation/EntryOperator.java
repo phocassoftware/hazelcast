@@ -367,7 +367,7 @@ public final class EntryOperator {
 
     public Object extractNewValue() {
         if (inMemoryFormat == OBJECT) {
-            if (entry.getValue() instanceof Immutable) {
+            if (Immutable.isImmutable(entry.getValue())) {
                 return entry.getValue();
             } else {
                 return ss.toObject(ss.toData(entry.getValue()));

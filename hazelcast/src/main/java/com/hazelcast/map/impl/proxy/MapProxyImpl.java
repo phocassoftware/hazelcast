@@ -149,7 +149,7 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         checkNotNull(ttlUnit, NULL_TTL_UNIT_IS_NOT_ALLOWED);
         checkNotNull(maxIdleUnit, NULL_MAX_IDLE_UNIT_IS_NOT_ALLOWED);
 
-        Data valueData = toData(value);
+        Object valueData = makeSafe(value);
         Object result = putInternal(key, valueData, ttl, ttlUnit, maxIdle, maxIdleUnit);
         return toObject(result);
     }
@@ -250,7 +250,7 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         checkNotNull(ttlUnit, NULL_TTL_UNIT_IS_NOT_ALLOWED);
 
         Object valueData = makeSafe(value);
-        setInternal(key, value, ttl, ttlUnit, UNSET, TimeUnit.MILLISECONDS);
+        setInternal(key, valueData, ttl, ttlUnit, UNSET, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -262,7 +262,7 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         checkNotNull(ttlUnit, NULL_TTL_UNIT_IS_NOT_ALLOWED);
         checkNotNull(maxIdleUnit, NULL_MAX_IDLE_UNIT_IS_NOT_ALLOWED);
 
-        Data valueData = toData(value);
+        Object valueData = makeSafe(value);
         setInternal(key, valueData, ttl, ttlUnit, maxIdle, maxIdleUnit);
     }
 
