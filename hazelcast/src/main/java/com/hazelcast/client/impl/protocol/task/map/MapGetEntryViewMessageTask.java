@@ -54,8 +54,24 @@ public class MapGetEntryViewMessageTask
 
     @Override
     protected ClientMessage encodeResponse(Object response) {
-        SimpleEntryView<Data, Data> dataEntryView = (SimpleEntryView<Data, Data>) response;
-        return MapGetEntryViewCodec.encodeResponse(dataEntryView, dataEntryView != null ? dataEntryView.getMaxIdle() : 0);
+        SimpleEntryView<?, ?> entryView = (SimpleEntryView<?, ?>) response;
+        SimpleEntryView<Data, Data> dataEntryView = entryView != null ? toDataEntryView(entryView) : null;
+        return MapGetEntryViewCodec.encodeResponse(dataEntryView, entryView != null ? entryView.getMaxIdle() : 0);
+    }
+
+    private SimpleEntryView<Data, Data> toDataEntryView(SimpleEntryView<?, ?> entryView) {
+        return new SimpleEntryView<Data, Data>(serializationService.toData(entryView.getKey()),
+                serializationService.toData(entryView.getValue()))
+                .withCost(entryView.getCost())
+                .withCreationTime(entryView.getCreationTime())
+                .withExpirationTime(entryView.getExpirationTime())
+                .withHits(entryView.getHits())
+                .withLastAccessTime(entryView.getLastAccessTime())
+                .withLastStoredTime(entryView.getLastStoredTime())
+                .withLastUpdateTime(entryView.getLastUpdateTime())
+                .withVersion(entryView.getVersion())
+                .withTtl(entryView.getTtl())
+                .withMaxIdle(entryView.getMaxIdle());
     }
 
     @Override

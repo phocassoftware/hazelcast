@@ -250,7 +250,7 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         checkNotNull(ttlUnit, NULL_TTL_UNIT_IS_NOT_ALLOWED);
 
         Object valueData = makeSafe(value);
-        setInternal(key, value, ttl, ttlUnit, UNSET, TimeUnit.MILLISECONDS);
+        setInternal(key, valueData, ttl, ttlUnit, UNSET, TimeUnit.MILLISECONDS);
     }
 
     @Override

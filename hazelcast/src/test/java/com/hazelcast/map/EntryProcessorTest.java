@@ -26,6 +26,7 @@ import com.hazelcast.core.EntryView;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.HazelcastJsonValue;
+import com.hazelcast.core.Immutable;
 import com.hazelcast.core.Offloadable;
 import com.hazelcast.core.ReadOnly;
 import com.hazelcast.internal.json.Json;
@@ -1623,7 +1624,7 @@ public class EntryProcessorTest extends HazelcastTestSupport {
         }
     }
 
-    private static class MyObject implements DataSerializable {
+    private static class MyObject implements DataSerializable, Immutable {
         int serializedCount = 0;
         int deserializedCount = 0;
 

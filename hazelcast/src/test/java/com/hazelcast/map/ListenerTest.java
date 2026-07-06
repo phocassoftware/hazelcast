@@ -26,6 +26,7 @@ import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.EntryListener;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
+import com.hazelcast.core.Immutable;
 import com.hazelcast.map.impl.MapListenerAdapter;
 import com.hazelcast.map.impl.MapService;
 import com.hazelcast.map.impl.event.MapPartitionEventData;
@@ -614,7 +615,7 @@ public class ListenerTest extends HazelcastTestSupport {
         }
     }
 
-    private static class SerializeCheckerObject implements DataSerializable {
+    private static class SerializeCheckerObject implements DataSerializable, Immutable {
 
         static volatile boolean serialized = false;
         static volatile boolean deserialized = false;

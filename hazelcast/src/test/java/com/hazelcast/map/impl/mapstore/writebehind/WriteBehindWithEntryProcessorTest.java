@@ -17,6 +17,7 @@
 package com.hazelcast.map.impl.mapstore.writebehind;
 
 import com.hazelcast.config.InMemoryFormat;
+import com.hazelcast.core.Immutable;
 import com.hazelcast.map.IMap;
 import com.hazelcast.map.MapStore;
 import com.hazelcast.map.MapStoreAdapter;
@@ -180,7 +181,7 @@ public class WriteBehindWithEntryProcessorTest extends HazelcastTestSupport {
         }
     }
 
-    private static class TestObject implements DataSerializable {
+    private static class TestObject implements DataSerializable, Immutable {
 
         int serializedCount = 0;
         int deserializedCount = 0;

@@ -103,7 +103,7 @@ public class IndexDeserializationTest extends HazelcastTestSupport {
         for (int i = 0; i < ENTRY_COUNT; ++i) {
             map.set(i, new Record(i));
         }
-        assertEquals(inMemoryFormat == InMemoryFormat.OBJECT ? ENTRY_COUNT : ENTRY_COUNT * 2, Record.deserializationCount.get());
+        assertEquals(inMemoryFormat == InMemoryFormat.OBJECT ? 0 : ENTRY_COUNT * 2, Record.deserializationCount.get());
         assertEquals(3, map.getLocalMapStats().getIndexStats().size());
         for (LocalIndexStats indexStats : map.getLocalMapStats().getIndexStats().values()) {
             assertEquals(ENTRY_COUNT, indexStats.getUpdateCount());
