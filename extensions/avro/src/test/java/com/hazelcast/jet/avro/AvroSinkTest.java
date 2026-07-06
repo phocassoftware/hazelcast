@@ -154,6 +154,7 @@ public class AvroSinkTest extends JetTestSupport {
         File[] files = directory.listFiles();
         assertNotNull(files);
         assertEquals(1, files.length);
+        assertEquals("0.avro", files[0].getName());
         int[] count = {0};
         try (DataFileReader<R> reader = new DataFileReader<>(files[0], datumReader)) {
             reader.forEach(datum -> count[0]++);
