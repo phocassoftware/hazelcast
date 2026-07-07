@@ -75,7 +75,8 @@ public class MapGetAllMessageTask
 
     @Override
     protected ClientMessage encodeResponse(Object response) {
-        return MapGetAllCodec.encodeResponse(((MapEntries) response).entries());
+        return MapGetAllCodec.encodeResponse(MapResponseDataUtils.toDataEntries(serializationService,
+                ((MapEntries) response).entries()));
     }
 
     @Override

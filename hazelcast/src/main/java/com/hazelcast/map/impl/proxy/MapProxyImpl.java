@@ -19,6 +19,8 @@ package com.hazelcast.map.impl.proxy;
 import com.hazelcast.aggregation.Aggregator;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.EntryView;
+import com.hazelcast.core.HazelcastInstanceAware;
+import com.hazelcast.core.Immutable;
 import com.hazelcast.core.ManagedContext;
 import com.hazelcast.internal.journal.EventJournalInitialSubscriberState;
 import com.hazelcast.internal.namespace.NamespaceUtil;
@@ -133,8 +135,8 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         checkNotNull(value, NULL_VALUE_IS_NOT_ALLOWED);
         checkNotNull(timeunit, NULL_TIMEUNIT_IS_NOT_ALLOWED);
 
-        Data valueData = toData(value);
-        Data result = putInternal(key, valueData, ttl, timeunit, UNSET, TimeUnit.MILLISECONDS);
+        var valueData = makeSafe(value);
+        Object result = putInternal(key, valueData, ttl, timeunit, UNSET, TimeUnit.MILLISECONDS);
         return toObject(result);
     }
 
@@ -147,8 +149,8 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         checkNotNull(ttlUnit, NULL_TTL_UNIT_IS_NOT_ALLOWED);
         checkNotNull(maxIdleUnit, NULL_MAX_IDLE_UNIT_IS_NOT_ALLOWED);
 
-        Data valueData = toData(value);
-        Data result = putInternal(key, valueData, ttl, ttlUnit, maxIdle, maxIdleUnit);
+        Object valueData = makeSafe(value);
+        Object result = putInternal(key, valueData, ttl, ttlUnit, maxIdle, maxIdleUnit);
         return toObject(result);
     }
 
@@ -247,7 +249,7 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         checkNotNull(value, NULL_VALUE_IS_NOT_ALLOWED);
         checkNotNull(ttlUnit, NULL_TTL_UNIT_IS_NOT_ALLOWED);
 
-        Data valueData = toData(value);
+        Object valueData = makeSafe(value);
         setInternal(key, valueData, ttl, ttlUnit, UNSET, TimeUnit.MILLISECONDS);
     }
 
@@ -260,7 +262,7 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         checkNotNull(ttlUnit, NULL_TTL_UNIT_IS_NOT_ALLOWED);
         checkNotNull(maxIdleUnit, NULL_MAX_IDLE_UNIT_IS_NOT_ALLOWED);
 
-        Data valueData = toData(value);
+        Object valueData = makeSafe(value);
         setInternal(key, valueData, ttl, ttlUnit, maxIdle, maxIdleUnit);
     }
 
@@ -679,7 +681,7 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         if (entryViewInternal == null) {
             return null;
         }
-        Data value = (Data) entryViewInternal.getValue();
+        var value = entryViewInternal.getValue();
         entryViewInternal.setKey(key);
         entryViewInternal.setValue(toObject(value));
         return entryViewInternal;
@@ -851,7 +853,7 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         checkNotNull(key, NULL_KEY_IS_NOT_ALLOWED);
         handleHazelcastInstanceAwareParams(entryProcessor);
 
-        Data result = executeOnKeyInternal(key, entryProcessor).joinInternal();
+        Object result = executeOnKeyInternal(key, entryProcessor).joinInternal();
         return toObject(result);
     }
 
@@ -902,7 +904,7 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         checkNotNull(entryProcessor, NULL_ENTRYPROCESSOR_IS_NOT_ALLOWED);
         checkDoesNotContainPagingPredicate(predicate, "executeOnEntries");
         handleHazelcastInstanceAwareParams(entryProcessor, predicate);
-        List<Data> result = new ArrayList<>();
+        List<Object> result = new ArrayList<>();
 
         executeOnEntriesInternal(entryProcessor, predicate, result);
         if (result.isEmpty()) {
@@ -911,8 +913,8 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
 
         Map<K, R> resultingMap = createHashMap(result.size() / 2);
         for (int i = 0; i < result.size(); ) {
-            Data key = result.get(i++);
-            Data value = result.get(i++);
+            Object key = result.get(i++);
+            Object value = result.get(i++);
 
             resultingMap.put(toObject(key), toObject(value));
 
@@ -933,7 +935,9 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         checkDoesNotContainPagingPredicate(predicate, "aggregate");
 
         // HazelcastInstanceAware handled by cloning
-        aggregator = serializationService.toObject(serializationService.toData(aggregator));
+        if (aggregator instanceof HazelcastInstanceAware aware) {
+            aware.setHazelcastInstance(this.getNodeEngine().getHazelcastInstance());
+        }
 
         AggregationResult result = executeQueryInternal(predicate, aggregator, null, IterationType.ENTRY, Target.ALL_NODES);
         return result.<R>getAggregator().aggregate();
@@ -1456,4 +1460,10 @@ public class MapProxyImpl<K, V> extends MapProxySupport<K, V> {
         }
     }
 
+    private Object makeSafe(V value) {
+        if (Immutable.isImmutable(value)) {
+            return value;
+        }
+        return toData(value);
+    }
 }

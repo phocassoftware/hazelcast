@@ -23,7 +23,7 @@
     <groupId>com.hazelcast</groupId>
     <artifactId>hazelcast-parent</artifactId>
     <packaging>pom</packaging>
-    <version>5.7.0</version>
+    <version>5.7.0-phocas</version>
 
     <name>Hazelcast Parent POM</name>
     <description>Provides a base configuration for Hazelcast Platform builds</description>
@@ -1393,6 +1393,31 @@
                 <!-- https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html#useIncrementalCompilation -->
                 <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
             </properties>
+        </profile>
+
+        <profile>
+            <!--
+            Publishes this fork to GitHub Packages with source artifacts attached.
+            Activate with: -Pgithub-packages
+            -->
+            <id>github-packages</id>
+            <properties>
+                <github.packages.repository>phocassoftware/hazelcast</github.packages.repository>
+                <maven.source.skip>false</maven.source.skip>
+                <maven.shade.createSourcesJar>true</maven.shade.createSourcesJar>
+            </properties>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub Packages</name>
+                    <url>https://maven.pkg.github.com/${github.packages.repository}</url>
+                </repository>
+                <snapshotRepository>
+                    <id>github</id>
+                    <name>GitHub Packages</name>
+                    <url>https://maven.pkg.github.com/${github.packages.repository}</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
 
         <profile>

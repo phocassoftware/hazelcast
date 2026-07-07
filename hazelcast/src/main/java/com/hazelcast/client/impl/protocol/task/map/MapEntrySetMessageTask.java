@@ -45,7 +45,7 @@ public class MapEntrySetMessageTask
 
     @Override
     protected Object reduce(Collection<QueryResultRow> result) {
-        List<Map.Entry<Data, Data>> entries = new ArrayList<>(result);
+        List<Map.Entry<Data, Object>> entries = new ArrayList<>(result);
         MapService mapService = (MapService) getService(MapService.SERVICE_NAME);
 
         incrementOtherOperationsCount(mapService, parameters);
@@ -74,8 +74,10 @@ public class MapEntrySetMessageTask
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected ClientMessage encodeResponse(Object response) {
-        return MapEntrySetCodec.encodeResponse((List<Map.Entry<Data, Data>>) response);
+        return MapEntrySetCodec.encodeResponse(MapResponseDataUtils.toDataEntries(serializationService,
+                (List<Map.Entry<Data, Object>>) response));
     }
 
     @Override

@@ -126,7 +126,7 @@ public final class AvroProcessors {
                 Path directory = Paths.get(directoryName);
                 directory.toFile().mkdirs();
 
-                Path file = directory.resolve(String.valueOf(context.globalProcessorIndex()));
+                Path file = directory.resolve(context.globalProcessorIndex() + ".avro");
                 DataFileWriter<D> writer = new DataFileWriter<>(datumWriterSupplier.get());
                 writer.create(schema, file.toFile());
                 return writer;

@@ -121,12 +121,11 @@ public class PutAllBackupOperation extends MapOperation
         out.writeInt(keyValueRecordExpiry.size() / 4);
         for (int i = 0; i < keyValueRecordExpiry.size(); i += 4) {
             Data dataKey = (Data) keyValueRecordExpiry.get(i);
-            Data dataValue = (Data) keyValueRecordExpiry.get(i + 1);
             Record record = (Record) keyValueRecordExpiry.get(i + 2);
             ExpiryMetadata expiryMetadata = (ExpiryMetadata) keyValueRecordExpiry.get(i + 3);
 
             IOUtil.writeData(out, dataKey);
-            Records.writeRecord(out, record, dataValue);
+            Records.writeRecord(out, record);
             Records.writeExpiry(out, expiryMetadata);
         }
         out.writeBoolean(disableWanReplicationEvent);
