@@ -71,8 +71,7 @@ public class MapExecuteOnAllKeysMessageTask
     @Override
     protected ClientMessage encodeResponse(Object response) {
         var list = (List<Map.Entry<Data, Object>>) response;
-        return MapExecuteOnAllKeysCodec.encodeResponse(list.stream()
-                .map(e -> Map.entry(e.getKey(), serializationService.<Data>toData(e.getValue()))).toList());
+        return MapExecuteOnAllKeysCodec.encodeResponse(MapResponseDataUtils.toDataEntries(serializationService, list));
     }
 
     @Override

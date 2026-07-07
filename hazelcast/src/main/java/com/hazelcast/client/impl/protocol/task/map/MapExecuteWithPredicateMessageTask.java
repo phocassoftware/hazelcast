@@ -112,8 +112,8 @@ public class MapExecuteWithPredicateMessageTask
     @Override
     protected ClientMessage encodeResponse(Object response) {
         var list = (List<Map.Entry<Data, Object>>) response;
-        return MapExecuteWithPredicateCodec.encodeResponse(list.stream()
-                .map(e -> Map.entry(e.getKey(), serializationService.<Data>toData(e.getValue()))).toList());
+        return MapExecuteWithPredicateCodec.encodeResponse(
+                MapResponseDataUtils.toDataEntries(serializationService, list));
     }
 
     @Override

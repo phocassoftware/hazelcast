@@ -74,8 +74,10 @@ public class MapEntrySetMessageTask
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected ClientMessage encodeResponse(Object response) {
-        return MapEntrySetCodec.encodeResponse((List<Map.Entry<Data, Data>>) response);
+        return MapEntrySetCodec.encodeResponse(MapResponseDataUtils.toDataEntries(serializationService,
+                (List<Map.Entry<Data, Object>>) response));
     }
 
     @Override

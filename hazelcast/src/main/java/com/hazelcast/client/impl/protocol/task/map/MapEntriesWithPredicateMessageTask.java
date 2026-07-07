@@ -59,8 +59,10 @@ public class MapEntriesWithPredicateMessageTask
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected ClientMessage encodeResponse(Object response) {
-        return MapEntriesWithPredicateCodec.encodeResponse((List<Map.Entry<Data, Data>>) response);
+        return MapEntriesWithPredicateCodec.encodeResponse(MapResponseDataUtils.toDataEntries(serializationService,
+                (List<Map.Entry<Data, Object>>) response));
     }
 
     @Override

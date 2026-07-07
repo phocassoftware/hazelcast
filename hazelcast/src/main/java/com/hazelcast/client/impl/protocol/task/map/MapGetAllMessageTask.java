@@ -21,7 +21,6 @@ import com.hazelcast.client.impl.protocol.codec.MapGetAllCodec;
 import com.hazelcast.client.impl.protocol.task.AbstractPartitionMessageTask;
 import com.hazelcast.instance.impl.Node;
 import com.hazelcast.internal.nio.Connection;
-import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.util.Timer;
 import com.hazelcast.map.impl.MapContainer;
 import com.hazelcast.map.impl.MapEntries;
@@ -33,7 +32,6 @@ import com.hazelcast.security.permission.MapPermission;
 import com.hazelcast.spi.impl.operationservice.Operation;
 
 import java.security.Permission;
-import java.util.Map;
 
 public class MapGetAllMessageTask
         extends AbstractPartitionMessageTask<MapGetAllCodec.RequestParameters> {
@@ -77,9 +75,8 @@ public class MapGetAllMessageTask
 
     @Override
     protected ClientMessage encodeResponse(Object response) {
-        var collection = ((MapEntries) response).entries().stream()
-                .map(e -> Map.entry(e.getKey(), serializationService.<Data>toData(e.getValue()))).toList();
-        return MapGetAllCodec.encodeResponse(collection);
+        return MapGetAllCodec.encodeResponse(MapResponseDataUtils.toDataEntries(serializationService,
+                ((MapEntries) response).entries()));
     }
 
     @Override
