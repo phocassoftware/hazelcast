@@ -26,6 +26,7 @@ import com.hazelcast.internal.nio.Bits;
 import com.hazelcast.internal.nio.Packet;
 import com.hazelcast.spi.impl.NodeEngine;
 import com.hazelcast.spi.impl.operationservice.impl.responses.ErrorResponse;
+import com.hazelcast.nio.serialization.HazelcastSerializationException;
 
 import java.nio.ByteOrder;
 import java.util.function.Consumer;
@@ -97,7 +98,19 @@ public final class InboundResponseHandler implements Consumer<Packet> {
                     notifyCallTimeout(callId, sender);
                     break;
                 case ERROR_RESPONSE:
-                    ErrorResponse errorResponse = serializationService.toObject(packet);
+                    ErrorResponse errorResponse;
+                    try {
+                        errorResponse = serializationService.toObject(packet);
+                    } catch (HazelcastSerializationException e) {
+                        // Phocas: don't just log and drop this - e.g. a class-filter rejection on
+                        // some class referenced by the remote exception's object graph. Without
+                        // this, we can't even decode the failure being reported, the Invocation is
+                        // left uncompleted, and the caller hangs until the operation-heartbeat-
+                        // timeout instead of getting a fast, real (if less specific) error.
+                        logger.severe("While processing response...", e);
+                        notifyErrorResponse(callId, e, sender);
+                        break;
+                    }
                     notifyErrorResponse(callId, errorResponse.getCause(), sender);
                     break;
                 default:
