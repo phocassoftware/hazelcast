@@ -311,7 +311,7 @@ class ShardReader extends AbstractShardWorker implements DynamicMetricsProvider 
     }
 
     private void updateGetNextRecordsTime(long currentTime, long minimumIncrease) {
-        nextGetRecordsTime = currentTime + Math.max(minimumIncrease, getRecordsRateTracker.next());
+        nextGetRecordsTime = currentTime + Math.max(minimumIncrease, MILLISECONDS.toNanos(getRecordsRateTracker.next()));
     }
 
     enum Result {
